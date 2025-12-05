@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key System - Your Key is Ready!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        
+        .loading {
+            display: block;
+        }
+        
+        .loading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .key-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%);
+            border-radius: 15px;
+            word-break: break-all;
+            border: 3px dashed #667eea;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .key-display::before {
+            content: '🔑';
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.1;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        .info {
+            margin-top: 25px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .info strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .success-msg {
+            color: #27ae60;
+            margin-top: 15px;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+        
+        .expiration {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .error {
+            display: none;
+            background: #ffe8e8;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .error.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .error h3 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        
+        .error p {
+            color: #666;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎉</div>
+        <h1>Your Key is Ready!</h1>
+        <p class="subtitle">Generating your access key...</p>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: #666;">Please wait a moment...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <h3 style="color: #27ae60; margin-bottom: 15px;">✅ Key Generated Successfully!</h3>
+            <div class="key-display" id="keyDisplay">XXXX-XXXX-XXXX-XXXX</div>
+            <button onclick="copyKey()">📋 COPY KEY</button>
+            <div class="expiration" id="expirationInfo"></div>
+            <p class="success-msg" id="successMsg" style="display: none;">✅ Key copied! Paste it in Roblox.</p>
+            
+            <div class="info">
+                <strong>📌 How to use:</strong>
+                1. Click "Copy Key" above<br>
+                2. Go back to Roblox<br>
+                3. Paste the key in the indicated field<br>
+                4. Enjoy the script!
+            </div>
+        </div>
+        
+        <div class="error" id="error">
+            <h3>❌ Error Generating Key</h3>
+            <p id="errorMsg">An error occurred. Please try again.</p>
+            <button onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // ⚙️ CONFIGURATION - PASTE YOUR URL HERE
+        const API_URL = "https://script.google.com/macros/s/AKfycbx5UW1xmB52h-zuRA5KazIG5d2mDWAQAkkcejNUe2Gp0Ofxmx-BkgajtkAqsVHIqyjT/exec";
+        
+        let generatedKey = "";
+        
+        // Get UserID from URL
+        function getUserIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('userid') || urlParams.get('hwid') || urlParams.get('id');
+        }
+        
+        // Generate key automatically
+        async function generateKey() {
+            const userid = getUserIdFromURL();
+            
+            if (!userid) {
+                showError("Invalid URL. The link must contain the User ID.");
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}?action=generate&hwid=${userid}&days=7`);
+                const data = await response.json();
+                
+                document.getElementById('loading').classList.add('hidden');
+                
+                if (data.success) {
+                    generatedKey = data.key;
+                    document.getElementById('keyDisplay').textContent = data.key;
+                    
+                    const expirationDate = new Date(data.expirationDate);
+                    const daysValid = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    document.getElementById('expirationInfo').innerHTML = `
+                        🕐 <strong>Valid for:</strong> ${daysValid} days<br>
+                        📅 <strong>Expires on:</strong> ${expirationDate.toLocaleDateString('en-US')} at ${expirationDate.toLocaleTimeString('en-US')}
+                    `;
+                    
+                    document.getElementById('result').classList.add('show');
+                } else {
+                    showError(data.message || "Unknown error while generating key.");
+                }
+            } catch (error) {
+                showError("Connection error with the server. Check your internet and try again.");
+                console.error("Error:", error);
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('errorMsg').textContent = message;
+            document.getElementById('error').classList.add('show');
+        }
+        
+        function copyKey() {
+            navigator.clipboard.writeText(generatedKey).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                const successMsg = document.getElementById('successMsg');
+                
+                btn.textContent = '✅ COPIED!';
+                btn.style.background = 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+                successMsg.style.display = 'block';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }, 3000);
+            }).catch(err => {
+                alert('❌ Error copying. Please select and copy manually.');
+            });
+        }
+        
+        // Start automatic generation when page loads
+        window.onload = function() {
+            generateKey();
+        };
+    </script>
+</body>
+</html>
